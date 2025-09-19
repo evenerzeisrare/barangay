@@ -1,6 +1,14 @@
 <?php
-// Include the bootstrap file first
-require_once 'bootstrap.php';
+// This file ensures correct path resolution for includes
+$root_path = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+$include_path = $root_path . 'includes' . DIRECTORY_SEPARATOR;
+
+// Set include path
+set_include_path(get_include_path() . PATH_SEPARATOR . $include_path);
+
+// Include necessary files
+require_once $include_path . 'config.php';
+require_once $include_path . 'functions.php';
 
 // Set default page title if not set
 if (!isset($page_title)) {
@@ -29,31 +37,22 @@ if (!isset($page_title)) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo SITE_URL; ?>index.php">Home</a>
+                        <a class="nav-link" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo SITE_URL; ?>about.php">About</a>
+                        <a class="nav-link" href="about.php">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo SITE_URL; ?>search.php">Services</a>
+                        <a class="nav-link" href="search.php">Services</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
                     <?php if (isLoggedIn()): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo SITE_URL; ?>dashboard.php">Dashboard</a>
+                            <a class="nav-link" href="dashboard.php">Dashboard</a>
                         </li>
-                        <?php if (isBuyer()): ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo SITE_URL; ?>buyer/bookings.php">My Bookings</a>
-                            </li>
-                        <?php elseif (isSeller()): ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo SITE_URL; ?>seller/bookings.php">Manage Bookings</a>
-                            </li>
-                        <?php endif; ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo SITE_URL; ?>messaging.php">
+                            <a class="nav-link" href="messaging.php">
                                 <i class="fas fa-envelope"></i>
                                 <?php 
                                 // Check for unread messages
@@ -78,17 +77,17 @@ if (!isset($page_title)) {
                                 <i class="fas fa-user"></i> <?php echo $_SESSION['username']; ?>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>profile.php">Profile</a></li>
+                                <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="<?php echo SITE_URL; ?>logout.php">Logout</a></li>
+                                <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                             </ul>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo SITE_URL; ?>login.php">Login</a>
+                            <a class="nav-link" href="login.php">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo SITE_URL; ?>register.php">Register</a>
+                            <a class="nav-link" href="register.php">Register</a>
                         </li>
                     <?php endif; ?>
                 </ul>

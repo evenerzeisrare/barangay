@@ -1,116 +1,77 @@
 <?php
-require_once 'includes/config.php';
-require_once 'includes/header.php';
+// Set the page title
+$page_title = "Home";
 
-$page_title = 'Home';
-$categories = getCategories();
-$featured_services = getFeaturedServices(6);
+// Include the bootstrap file
+require_once 'includes/bootstrap.php';
+
+// Include functions
+require_once 'includes/functions.php';
+
+$featured_services = getFeaturedServices();
+
+// Include the header
+require_once 'includes/header.php';
 ?>
 
-<!-- Hero Section -->
-<section class="hero" id="home">
-    <div class="hero-content">
-        <h2>Connecting You to Local Services</h2>
-        <p>Find the best services in your barangay with our comprehensive directory. Supporting local businesses has never been easier.</p>
-        
-        <form action="search.php" method="GET" class="search-bar">
-            <input type="text" name="q" placeholder="Search for services...">
-            <button type="submit"><i class="fas fa-search"></i> Search</button>
-        </form>
-    </div>
-</section>
-
-<!-- Services Section -->
-<section class="services" id="services">
+<div class="hero-section bg-primary text-white py-5 mb-5">
     <div class="container">
-        <div class="section-title">
-            <h2>Service Categories</h2>
-        </div>
-        
-        <div class="category-grid">
-            <?php foreach ($categories as $category): ?>
-                <div class="category-card">
-                    <div class="category-img">
-                        <img src="<?php echo SITE_URL; ?>/assets/images/category-<?php echo $category['id']; ?>.jpg" alt="<?php echo htmlspecialchars($category['name']); ?>">
-                    </div>
-                    <div class="category-info">
-                        <h3><?php echo htmlspecialchars($category['name']); ?></h3>
-                        <p><?php echo htmlspecialchars($category['description']); ?></p>
-                        <a href="services/?category=<?php echo $category['id']; ?>" class="btn">View Listings</a>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
-
-<!-- Featured Listings -->
-<section class="featured-listings" id="listings">
-    <div class="container">
-        <div class="section-title">
-            <h2>Featured Listings</h2>
-        </div>
-        
-        <div class="listing-grid">
-            <?php foreach ($featured_services as $service): ?>
-                <div class="listing-card">
-                    <div class="listing-img">
-                        <img src="<?php echo $service['image_path'] ? htmlspecialchars($service['image_path']) : SITE_URL . '/assets/images/service-default.jpg'; ?>" alt="<?php echo htmlspecialchars($service['title']); ?>">
-                    </div>
-                    <div class="listing-details">
-                        <h3><?php echo htmlspecialchars($service['title']); ?></h3>
-                        <div class="listing-meta">
-                            <span><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($service['location']); ?></span>
-                            <span><i class="fas fa-phone"></i> <?php echo htmlspecialchars($service['contact_number']); ?></span>
-                        </div>
-                        <div class="listing-description">
-                            <p><?php echo htmlspecialchars(substr($service['description'], 0, 100)); ?>...</p>
-                        </div>
-                        <div class="listing-actions">
-                            <a href="services/view.php?id=<?php echo $service['id']; ?>" class="contact-btn">View Details</a>
-                            <div class="rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-        
-        <div class="text-center mt-2">
-            <a href="services/" class="btn btn-outline">View All Listings</a>
-        </div>
-    </div>
-</section>
-
-<!-- About Section -->
-<section class="about" id="about">
-    <div class="container">
-        <div class="section-title">
-            <h2>About Our Directory</h2>
-        </div>
-        
-        <div class="about-content">
-            <div class="about-img">
-                <img src="<?php echo SITE_URL; ?>/assets/images/about.jpg" alt="Barangay community helping each other in a friendly neighborhood setting">
-            </div>
-            <div class="about-text">
-                <h3>Supporting Our Community</h3>
-                <p>The Ampayon Services was created to bridge the gap between local service providers and residents. Our goal is to make it easy for community members to find the services they need while supporting small businesses within the barangay.</p>
-                <p>This platform showcases the diverse range of talents and services available right in your neighborhood. From essential goods to specialized skills, we connect you with trustworthy providers.</p>
-                <p>All listings are verified by our barangay officials to ensure quality and reliability. We believe in community-powered solutions that benefit everyone.</p>
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold">Connect with Local Services</h1>
+                <p class="lead">BarangayLink helps you discover and book services from trusted sellers in your community.</p>
+                <a href="search.php" class="btn btn-light btn-lg mt-3">Explore Services</a>
                 <?php if (!isLoggedIn()): ?>
-                    <a href="register.php" class="btn mt-1">Join Our Community</a>
+                    <a href="register.php" class="btn btn-outline-light btn-lg mt-3 ms-2">Join Now</a>
                 <?php endif; ?>
             </div>
+            <div class="col-md-6">
+                <img src="images/community.svg" alt="Community Connection" class="img-fluid">
+            </div>
         </div>
     </div>
-</section>
+</div>
 
-<?php
-require_once 'includes/footer.php';
-?>
+<div class="container">
+    <h2 class="text-center mb-5">Featured Services</h2>
+    
+    <div class="row">
+        <?php if (count($featured_services) > 0): ?>
+            <?php foreach ($featured_services as $service): ?>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 service-card">
+                        <?php if (!empty($service['image'])): ?>
+                            <img src="data:image/jpeg;base64,<?php echo base64_encode($service['image']); ?>" class="card-img-top" alt="<?php echo $service['title']; ?>" style="height: 200px; object-fit: cover;">
+                        <?php else: ?>
+                            <img src="images/service-placeholder.jpg" class="card-img-top" alt="Service Image" style="height: 200px; object-fit: cover;">
+                        <?php endif; ?>
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo $service['title']; ?></h5>
+                            <p class="card-text">
+                                <span class="badge bg-primary"><?php echo $service['category']; ?></span>
+                                <span class="badge bg-secondary"><?php echo $service['location']; ?></span>
+                            </p>
+                            <p class="card-text">₱<?php echo number_format($service['price'], 2); ?></p>
+                            <p class="card-text">By: <?php echo $service['seller_name']; ?></p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="service_detail.php?id=<?php echo $service['id']; ?>" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    No featured services available at the moment.
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+    
+    <div class="text-center mt-5">
+        <a href="search.php" class="btn btn-outline-primary btn-lg">View All Services</a>
+    </div>
+</div>
+
+<?php require_once 'includes/footer.php'; ?>

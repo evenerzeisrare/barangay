@@ -1,80 +1,90 @@
 <?php
-require_once 'includes/config.php';
+// Set the page title
+$page_title = "Login";
 
+// Include the bootstrap file
+require_once 'includes/bootstrap.php';
+
+// Check if user is already logged in
 if (isLoggedIn()) {
-    header("Location: " . SITE_URL);
-    exit();
+    redirect('dashboard.php');
 }
 
-$page_title = 'Login';
-$errors = [];
+$error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
+    $username = sanitizeInput($_POST['username']);
+    $password = $_POST['password'];
     
-    if (empty($username)) {
-        $errors['username'] = 'Username is required';
-    }
+    $database = new Database();
+    $db = $database->getConnection();
     
-    if (empty($password)) {
-        $errors['password'] = 'Password is required';
-    }
+    $query = "SELECT id, username, password, role, full_name FROM users WHERE username = :username OR email = :username";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
     
-    if (empty($errors)) {
-        if (loginUser($username, $password)) {
-            header("Location: " . SITE_URL);
-            exit();
+    if ($stmt->rowCount() == 1) {
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['full_name'] = $user['full_name'];
+            
+            // Log the login action
+            logAction($user['id'], 'login', 'users', $user['id']);
+            
+            // Check if there's a redirect URL
+            $redirect_url = $_SESSION['redirect_url'] ?? 'dashboard.php';
+            unset($_SESSION['redirect_url']);
+            
+            redirect($redirect_url);
         } else {
-            $errors['general'] = 'Invalid username or password';
+            $error = 'Invalid password.';
         }
+    } else {
+        $error = 'No account found with that username/email.';
     }
 }
 
+// Include the header
 require_once 'includes/header.php';
 ?>
 
-<section class="contact">
-    <div class="container">
-        <div class="section-title">
-            <h2>Login to Your Account</h2>
-        </div>
-        
-        <?php if (isset($errors['general'])): ?>
-            <div class="alert alert-danger">
-                <p><?php echo htmlspecialchars($errors['general']); ?></p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Login to Your Account</h3>
+                </div>
+                <div class="card-body">
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger"><?php echo $error; ?></div>
+                    <?php endif; ?>
+                    
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username or Email</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <p>Don't have an account? <a href="register.php">Register here</a></p>
+                    </div>
+                </div>
             </div>
-        <?php endif; ?>
-        
-        <div class="contact-form">
-            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" class="form-control" 
-                           value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>" required>
-                    <?php if (isset($errors['username'])): ?>
-                        <small class="text-danger"><?php echo htmlspecialchars($errors['username']); ?></small>
-                    <?php endif; ?>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" required>
-                    <?php if (isset($errors['password'])): ?>
-                        <small class="text-danger"><?php echo htmlspecialchars($errors['password']); ?></small>
-                    <?php endif; ?>
-                </div>
-                
-                <button type="submit" class="submit-btn">Login</button>
-                
-                <p class="text-center mt-1">
-                    Don't have an account? <a href="register.php">Register here</a>
-                </p>
-            </form>
         </div>
     </div>
-</section>
+</div>
 
-<?php
-require_once 'includes/footer.php';
-?>
+<?php require_once 'includes/footer.php'; ?>

@@ -1,11 +1,11 @@
 <?php
-
+// Set the page title
 $page_title = "Register";
 
-
+// Include the bootstrap file
 require_once 'includes/bootstrap.php';
 
-
+// Check if user is already logged in
 if (isLoggedIn()) {
     redirect('dashboard.php');
 }
@@ -22,35 +22,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role = sanitizeInput($_POST['role']);
     $address = sanitizeInput($_POST['address']);
     $phone = sanitizeInput($_POST['phone']);
-
-  
-    if (!preg_match('/^[0-9]+$/', $phone)) {
-        $error = 'Phone number must contain numbers only.';
-    }
-
-    elseif ($password !== $confirm_password) {
+    
+    // Validate passwords match
+    if ($password !== $confirm_password) {
         $error = 'Passwords do not match.';
-    }
-  
-    elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/', $password)) {
-        $error = 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.';
     } else {
         $database = new Database();
         $db = $database->getConnection();
-
-
+        
+        // Check if username or email already exists
         $query = "SELECT id FROM users WHERE username = :username OR email = :email";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':username', $username);
         $stmt->bindParam(':email', $email);
         $stmt->execute();
-
+        
         if ($stmt->rowCount() > 0) {
             $error = 'Username or email already exists.';
         } else {
             // Hash password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
+            
             // Insert new user
             $query = "INSERT INTO users (username, password, email, role, full_name, address, phone) 
                       VALUES (:username, :password, :email, :role, :full_name, :address, :phone)";
@@ -62,13 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindParam(':full_name', $full_name);
             $stmt->bindParam(':address', $address);
             $stmt->bindParam(':phone', $phone);
-
+            
             if ($stmt->execute()) {
                 $user_id = $db->lastInsertId();
-
+                
                 // Log the registration action
                 logAction($user_id, 'register', 'users', $user_id);
-
+                
                 $success = 'Account created successfully. You can now <a href="login.php">login</a>.';
             } else {
                 $error = 'Error creating account. Please try again.';
@@ -117,9 +109,6 @@ require_once 'includes/header.php';
                                     <div class="mb-3">
                                         <label for="password" class="form-label">Password</label>
                                         <input type="password" class="form-control" id="password" name="password" required>
-                                        <div id="passwordWarning" class="text-danger mt-1" style="display:none;">
-                                            Password must be at least 8 characters, include uppercase, lowercase, number, and special character.
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -151,9 +140,6 @@ require_once 'includes/header.php';
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Phone Number</label>
                                 <input type="tel" class="form-control" id="phone" name="phone">
-                                <div id="phoneWarning" class="text-danger mt-1" style="display:none;">
-                                    Phone number must contain numbers only.
-                                </div>
                             </div>
                             
                             <div class="d-grid">
@@ -170,22 +156,5 @@ require_once 'includes/header.php';
         </div>
     </div>
 </div>
-
-<script>
-    const passwordInput = document.getElementById('password');
-    const phoneInput = document.getElementById('phone');
-    const passwordWarning = document.getElementById('passwordWarning');
-    const phoneWarning = document.getElementById('phoneWarning');
-
-    passwordInput.addEventListener('input', () => {
-        const strongPassword = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
-        passwordWarning.style.display = strongPassword.test(passwordInput.value) ? 'none' : 'block';
-    });
-
-    phoneInput.addEventListener('input', () => {
-        const numbersOnly = /^[0-9]*$/;
-        phoneWarning.style.display = numbersOnly.test(phoneInput.value) ? 'none' : 'block';
-    });
-</script>
 
 <?php require_once 'includes/footer.php'; ?>
