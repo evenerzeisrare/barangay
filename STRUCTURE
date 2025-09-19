@@ -1,0 +1,45 @@
+barangaylink/
+├── index.php
+├── about.php
+├── login.php
+├── register.php
+├── logout.php
+├── dashboard.php
+├── search.php
+├── service_detail.php
+├── messaging.php
+├── bookings.php
+├── includes/
+│   ├── config.php
+│   ├── header.php
+│   ├── footer.php
+│   ├── auth.php
+│   ├── database.php
+│   ├── functions.php
+│   └── upload.php
+├── css/
+│   └── style.css
+├── js/
+│   └── script.js
+├── images/
+│   └── logo.png
+├── buyer/
+│   ├── dashboard.php
+│   ├── search.php
+│   ├── service_detail.php
+│   ├── messaging.php
+│   ├── bookings.php
+│   └── booking_action.php
+├── seller/
+│   ├── dashboard.php
+│   ├── manage_services.php
+│   ├── add_service.php
+│   ├── edit_service.php
+│   ├── delete_service.php
+│   ├── messaging.php
+│   ├── bookings.php
+│   ├── approve_booking.php
+│   └── cancel_booking.php
+└── admin/
+    ├── audit_log.php
+    └── user_management.php

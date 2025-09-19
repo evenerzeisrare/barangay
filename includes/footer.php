@@ -1,46 +1,32 @@
-    <!-- Footer -->
-    <footer>
+    </main>
+    <footer class="bg-dark text-light py-4 mt-5">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>About Us</h3>
-                    <p>The Ampayon Services is a community initiative to support local businesses and service providers.</p>
-                    <div class="social-links mt-1">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                    </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>BarangayLink</h5>
+                    <p>Connecting buyers and sellers in your local community.</p>
                 </div>
-                
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="<?php echo SITE_URL; ?>">Home</a></li>
-                        <li><a href="<?php echo SITE_URL; ?>/services">Services</a></li>
-                        <li><a href="<?php echo SITE_URL; ?>/contact.php">Contact</a></li>
-                        <?php if (!isLoggedIn()): ?>
-                            <li><a href="<?php echo SITE_URL; ?>/login.php">Login</a></li>
-                            <li><a href="<?php echo SITE_URL; ?>/register.php">Register</a></li>
-                        <?php endif; ?>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.php" class="text-light">Home</a></li>
+                        <li><a href="about.php" class="text-light">About</a></li>
+                        <li><a href="search.php" class="text-light">Services</a></li>
                     </ul>
                 </div>
-                
-                <div class="footer-column">
-                    <h3>Contact Info</h3>
-                    <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> Ampayon, Butuan City, Agusan Del Sur</li>
-                        <li><i class="fas fa-phone"></i> 0918 712 9692</li>
-                        <li><i class="fas fa-envelope"></i> jherzelljane.sayahan18@gmail.com</li>
-                    </ul>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p><i class="fas fa-envelope"></i> info@barangaylink.com</p>
+                    <p><i class="fas fa-phone"></i> +63 912 345 6789</p>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All Rights Reserved.</p>
+            <hr>
+            <div class="text-center">
+                <p>&copy; <?php echo date('Y'); ?> BarangayLink. All rights reserved.</p>
             </div>
         </div>
     </footer>
-
-    <script src="<?php echo SITE_URL; ?>/assets/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>

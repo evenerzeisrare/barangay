@@ -1,22 +1,24 @@
 <?php
 // Database configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'barangay_services');
+if (!defined('DB_HOST')) define('DB_HOST', 'localhost');
+if (!defined('DB_NAME')) define('DB_NAME', 'barangaylink');
+if (!defined('DB_USER')) define('DB_USER', 'root');
+if (!defined('DB_PASS')) define('DB_PASS', '');
 
 // Site configuration
-define('SITE_NAME', 'AMPAYON SERVICES');
-define('SITE_URL', 'http://localhost/barangay-services');
+if (!defined('SITE_NAME')) define('SITE_NAME', 'BarangayLink');
+if (!defined('SITE_URL')) define('SITE_URL', 'http://localhost/BarangayLink/');
 
-// Start session
-session_start();
+// Path configuration - define these first
+if (!defined('ROOT_PATH')) define('ROOT_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
+if (!defined('INCLUDE_PATH')) define('INCLUDE_PATH', ROOT_PATH . 'includes' . DIRECTORY_SEPARATOR);
 
-// Error reporting
+// Enable error reporting for development
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Include other required files
-require_once 'db_functions.php';
-require_once 'auth_functions.php';
+// Start session
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
