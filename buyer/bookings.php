@@ -1,22 +1,12 @@
 <?php
-<<<<<<< Updated upstream
-
-$page_title = "Manage Bookings";
-
-
-require_once '../includes/bootstrap.php';
-
-// Check if user is logged in ba as a seller
-=======
 // Set the page title
-$page_title = "Manage Bookings";
+$page_title = "My Bookings";
 
 // Include the bootstrap file
 require_once '../includes/bootstrap.php';
 
-// Check if user is logged in and is a seller
->>>>>>> Stashed changes
-if (!isLoggedIn() || !isSeller()) {
+// Check if user is logged in and is a buyer
+if (!isLoggedIn() || !isBuyer()) {
     redirect('../index.php');
 }
 
@@ -25,31 +15,24 @@ $user_id = $_SESSION['user_id'];
 $database = new Database();
 $db = $database->getConnection();
 
-<<<<<<< Updated upstream
-// kuhaon ang seller's bookings
-=======
-// Get seller's bookings
->>>>>>> Stashed changes
-$query = "SELECT b.*, s.title as service_title, s.price, u.full_name as buyer_name 
+// Get buyer's bookings
+$query = "SELECT b.*, s.title as service_title, s.price, u.full_name as seller_name 
           FROM bookings b 
           JOIN services s ON b.service_id = s.id 
-          JOIN users u ON b.buyer_id = u.id 
-          WHERE s.seller_id = :user_id 
+          JOIN users u ON s.seller_id = u.id 
+          WHERE b.buyer_id = :user_id 
           ORDER BY b.created_at DESC";
 $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $user_id);
 $stmt->execute();
 $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-<<<<<<< Updated upstream
-=======
 // Include the header
->>>>>>> Stashed changes
 require_once '../includes/header.php';
 ?>
 
 <div class="container">
-    <h1 class="mb-4">Manage Bookings</h1>
+    <h1 class="mb-4">My Bookings</h1>
     
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
@@ -61,7 +44,7 @@ require_once '../includes/header.php';
     
     <div class="card">
         <div class="card-header">
-            <h5>Booking Requests</h5>
+            <h5>Booking History</h5>
         </div>
         <div class="card-body">
             <?php if (count($bookings) > 0): ?>
@@ -70,11 +53,10 @@ require_once '../includes/header.php';
                         <thead>
                             <tr>
                                 <th>Service</th>
-                                <th>Buyer</th>
+                                <th>Seller</th>
                                 <th>Price</th>
                                 <th>Status</th>
                                 <th>Date</th>
-                                <th>Message</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -82,7 +64,7 @@ require_once '../includes/header.php';
                             <?php foreach ($bookings as $booking): ?>
                                 <tr>
                                     <td><?php echo $booking['service_title']; ?></td>
-                                    <td><?php echo $booking['buyer_name']; ?></td>
+                                    <td><?php echo $booking['seller_name']; ?></td>
                                     <td>₱<?php echo number_format($booking['price'], 2); ?></td>
                                     <td>
                                         <span class="badge 
@@ -100,20 +82,9 @@ require_once '../includes/header.php';
                                     </td>
                                     <td><?php echo date('M j, Y', strtotime($booking['created_at'])); ?></td>
                                     <td>
-                                        <?php if (!empty($booking['message'])): ?>
-                                            <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="popover" title="Buyer Message" data-bs-content="<?php echo htmlspecialchars($booking['message']); ?>">
-                                                View Message
-                                            </button>
-                                        <?php else: ?>
-                                            <span class="text-muted">No message</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
+                                        <a href="../service_detail.php?id=<?php echo $booking['service_id']; ?>" class="btn btn-sm btn-outline-primary">View Service</a>
                                         <?php if ($booking['status'] === 'pending'): ?>
-                                            <a href="approve_booking.php?id=<?php echo $booking['id']; ?>" class="btn btn-sm btn-outline-success">Approve</a>
-                                            <a href="cancel_booking.php?id=<?php echo $booking['id']; ?>" class="btn btn-sm btn-outline-danger">Reject</a>
-                                        <?php elseif ($booking['status'] === 'confirmed'): ?>
-                                            <a href="complete_booking.php?id=<?php echo $booking['id']; ?>" class="btn btn-sm btn-outline-info">Mark Complete</a>
+                                            <a href="booking_action.php?action=cancel&id=<?php echo $booking['id']; ?>" class="btn btn-sm btn-outline-danger">Cancel</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -123,26 +94,12 @@ require_once '../includes/header.php';
                 </div>
             <?php else: ?>
                 <div class="text-center py-4">
-                    <p>You don't have any booking requests yet.</p>
-                    <p>When buyers book your services, they will appear here.</p>
+                    <p>You haven't made any bookings yet.</p>
+                    <a href="../search.php" class="btn btn-primary">Explore Services</a>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 </div>
-
-<script>
-<<<<<<< Updated upstream
-
-=======
-// Initialize popovers
->>>>>>> Stashed changes
-document.addEventListener('DOMContentLoaded', function() {
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
-    });
-});
-</script>
 
 <?php require_once '../includes/footer.php'; ?>

@@ -20,10 +20,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = sanitizeInput($_POST['description']);
     $is_featured = isset($_POST['is_featured']) ? 1 : 0;
     
+<<<<<<< Updated upstream
  
     $image = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $image = file_get_contents($_FILES['image']['tmp_name']);
+=======
+    // Handle image upload
+    $image_path = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = '../images/services/';
+        $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        
+        // Validate file type
+        if (in_array($file_extension, $allowed_extensions)) {
+            // Generate unique filename
+            $filename = uniqid() . '_' . time() . '.' . $file_extension;
+            $upload_path = $upload_dir . $filename;
+            
+            // Move uploaded file
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
+                $image_path = 'images/services/' . $filename;
+            } else {
+                $error = 'Failed to upload image. Please try again.';
+            }
+        } else {
+            $error = 'Invalid file type. Please upload only JPG, PNG, GIF, or WebP images.';
+        }
+>>>>>>> Stashed changes
     }
     
     $database = new Database();
@@ -38,12 +63,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':location', $location);
     $stmt->bindParam(':price', $price);
     $stmt->bindParam(':description', $description);
+<<<<<<< Updated upstream
     $stmt->bindParam(':image', $image, PDO::PARAM_LOB);
+=======
+    $stmt->bindParam(':image', $image_path);
+>>>>>>> Stashed changes
     $stmt->bindParam(':is_featured', $is_featured);
     
     if ($stmt->execute()) {
         $service_id = $db->lastInsertId();
         
+<<<<<<< Updated upstream
+=======
+        // Log the service creation action
+>>>>>>> Stashed changes
         logAction($user_id, 'create_service', 'services', $service_id);
         
         $_SESSION['success'] = 'Service added successfully.';

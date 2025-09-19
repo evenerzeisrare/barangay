@@ -17,7 +17,10 @@ $user_id = $_SESSION['user_id'];
 $database = new Database();
 $db = $database->getConnection();
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 // Verify the booking belongs to the seller
 $query = "SELECT b.* FROM bookings b 
           JOIN services s ON b.service_id = s.id 
