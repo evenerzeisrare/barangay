@@ -1,14 +1,8 @@
 <?php
-// Set the page title
-$page_title = "Profile";
-
-// Include the bootstrap file
-require_once 'includes/bootstrap.php';
-
-// Check if user is logged in
-if (!isLoggedIn()) {
-    redirect('login.php');
-}
+$page_title = "My Profile";
+require_once 'includes/header.php';
+require_once 'includes/auth.php';
+require_once 'includes/functions.php';
 
 $user_id = $_SESSION['user_id'];
 $error = '';
@@ -82,9 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-// Include the header
-require_once 'includes/header.php';
 ?>
 
 <div class="container mt-5">

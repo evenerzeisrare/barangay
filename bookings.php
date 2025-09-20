@@ -1,39 +1,34 @@
 <?php
+// Set the page title
 $page_title = "My Bookings";
-require_once 'includes/header.php';
-require_once 'includes/auth.php';
-require_once 'includes/functions.php';
+
+// Include the bootstrap file
+require_once '../includes/bootstrap.php';
+
+// Check if user is logged in and is a buyer
+if (!isLoggedIn() || !isBuyer()) {
+    redirect('../index.php');
+}
 
 $user_id = $_SESSION['user_id'];
 
 $database = new Database();
 $db = $database->getConnection();
 
-if (isBuyer()) {
-    // Get buyer's bookings
-    $query = "SELECT b.*, s.title as service_title, s.price, u.full_name as seller_name 
-              FROM bookings b 
-              JOIN services s ON b.service_id = s.id 
-              JOIN users u ON s.seller_id = u.id 
-              WHERE b.buyer_id = :user_id 
-              ORDER BY b.created_at DESC";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':user_id', $user_id);
-    $stmt->execute();
-    $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} elseif (isSeller()) {
-    // Get seller's bookings
-    $query = "SELECT b.*, s.title as service_title, s.price, u.full_name as buyer_name 
-              FROM bookings b 
-              JOIN services s ON b.service_id = s.id 
-              JOIN users u ON b.buyer_id = u.id 
-              WHERE s.seller_id = :user_id 
-              ORDER BY b.created_at DESC";
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':user_id', $user_id);
-    $stmt->execute();
-    $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+// Get buyer's bookings
+$query = "SELECT b.*, s.title as service_title, s.price, u.full_name as seller_name 
+          FROM bookings b 
+          JOIN services s ON b.service_id = s.id 
+          JOIN users u ON s.seller_id = u.id 
+          WHERE b.buyer_id = :user_id 
+          ORDER BY b.created_at DESC";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':user_id', $user_id);
+$stmt->execute();
+$bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Include the header
+require_once '../includes/header.php';
 ?>
 
 <div class="container">
@@ -48,6 +43,9 @@ if (isBuyer()) {
     <?php endif; ?>
     
     <div class="card">
+        <div class="card-header">
+            <h5>Booking History</h5>
+        </div>
         <div class="card-body">
             <?php if (count($bookings) > 0): ?>
                 <div class="table-responsive">
@@ -55,11 +53,7 @@ if (isBuyer()) {
                         <thead>
                             <tr>
                                 <th>Service</th>
-                                <?php if (isBuyer()): ?>
-                                    <th>Seller</th>
-                                <?php else: ?>
-                                    <th>Buyer</th>
-                                <?php endif; ?>
+                                <th>Seller</th>
                                 <th>Price</th>
                                 <th>Status</th>
                                 <th>Date</th>
@@ -70,13 +64,7 @@ if (isBuyer()) {
                             <?php foreach ($bookings as $booking): ?>
                                 <tr>
                                     <td><?php echo $booking['service_title']; ?></td>
-                                    <td>
-                                        <?php if (isBuyer()): ?>
-                                            <?php echo $booking['seller_name']; ?>
-                                        <?php else: ?>
-                                            <?php echo $booking['buyer_name']; ?>
-                                        <?php endif; ?>
-                                    </td>
+                                    <td><?php echo $booking['seller_name']; ?></td>
                                     <td>₱<?php echo number_format($booking['price'], 2); ?></td>
                                     <td>
                                         <span class="badge 
@@ -94,15 +82,9 @@ if (isBuyer()) {
                                     </td>
                                     <td><?php echo date('M j, Y', strtotime($booking['created_at'])); ?></td>
                                     <td>
-                                        <a href="service_detail.php?id=<?php echo $booking['service_id']; ?>" class="btn btn-sm btn-outline-primary">View Service</a>
-                                        
-                                        <?php if (isBuyer() && $booking['status'] === 'pending'): ?>
-                                            <a href="buyer/booking_action.php?action=cancel&id=<?php echo $booking['id']; ?>" class="btn btn-sm btn-outline-danger">Cancel</a>
-                                        <?php endif; ?>
-                                        
-                                        <?php if (isSeller() && $booking['status'] === 'pending'): ?>
-                                            <a href="seller/approve_booking.php?id=<?php echo $booking['id']; ?>" class="btn btn-sm btn-outline-success">Approve</a>
-                                            <a href="seller/cancel_booking.php?id=<?php echo $booking['id']; ?>" class="btn btn-sm btn-outline-danger">Reject</a>
+                                        <a href="../service_detail.php?id=<?php echo $booking['service_id']; ?>" class="btn btn-sm btn-outline-primary">View Service</a>
+                                        <?php if ($booking['status'] === 'pending'): ?>
+                                            <a href="booking_action.php?action=cancel&id=<?php echo $booking['id']; ?>" class="btn btn-sm btn-outline-danger">Cancel</a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -112,16 +94,12 @@ if (isBuyer()) {
                 </div>
             <?php else: ?>
                 <div class="text-center py-4">
-                    <p>You don't have any bookings yet.</p>
-                    <?php if (isBuyer()): ?>
-                        <a href="search.php" class="btn btn-primary">Explore Services</a>
-                    <?php else: ?>
-                        <p>When buyers book your services, they will appear here.</p>
-                    <?php endif; ?>
+                    <p>You haven't made any bookings yet.</p>
+                    <a href="../search.php" class="btn btn-primary">Explore Services</a>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 </div>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once '../includes/footer.php'; ?>

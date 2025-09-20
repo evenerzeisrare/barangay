@@ -1,6 +1,11 @@
 <?php
+// Set the page title
 $page_title = "Service Details";
-require_once 'includes/header.php';
+
+// Include the bootstrap file
+require_once 'includes/bootstrap.php';
+
+// Include functions
 require_once 'includes/functions.php';
 
 if (!isset($_GET['id'])) {
@@ -63,6 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isLoggedIn() && isBuyer()) {
         }
     }
 }
+
+// Include the header
+require_once 'includes/header.php';
 ?>
 
 <div class="container">
@@ -86,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isLoggedIn() && isBuyer()) {
         <div class="col-md-8">
             <div class="card mb-4">
                 <?php if (!empty($service['image'])): ?>
-                    <img src="<?php echo htmlspecialchars($service['image']); ?>" class="card-img-top" alt="<?php echo $service['title']; ?>">
+                    <img src="data:image/jpeg;base64,<?php echo base64_encode($service['image']); ?>" class="card-img-top" alt="<?php echo $service['title']; ?>">
                 <?php else: ?>
                     <img src="images/service-placeholder.jpg" class="card-img-top" alt="Service Image">
                 <?php endif; ?>
